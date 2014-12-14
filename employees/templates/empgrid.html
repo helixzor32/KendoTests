@@ -1,0 +1,107 @@
+<html>
+<head>
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/static/css/kendo.common.min.css" />
+    <link rel="stylesheet" href="/static/css/kendo.default.min.css" />
+    <link rel="stylesheet" href="/static/css/kendo.dataviz.min.css" />
+    <link rel="stylesheet" href="/static/css/kendo.dataviz.default.min.css" />
+    <link rel="stylesheet" href="/static/css/kendo.rtl.min.css" />
+	<link rel="stylesheet" href="/static/css/examples-offline.css" />
+    <script src="/static/js/jquery.min.js"></script>
+	<script src="/static/js/angular.min.js"></script>
+    <script src="/static/js/kendo.all.min.js"></script>
+	<script src="/static/js/console.js"></script>
+</head>
+<body style="background-color: white;">
+		<script src="/static/js/people.js"></script>
+        <div id="example">
+            <div id="grid"><center><img src="/static/images/loading.gif" /></center></div>
+            <script>
+				//Main var to hold server data
+				var gridSource = [];
+				var gridData;
+				var gridColumns = [];
+				var id = 1;
+				
+				//hardcoded for now
+				var fieldnames = { 'lname' : 'Last Name', 'fname' : 'First Name', 'id' : 'Employee ID', 'city' : 'City', 'title' : 'Title', 'dob' : 'Date Of Birth', 'age' : 'Age' };
+
+                $(document).ready(function() {
+					//Get view fields
+					fieldData = new kendo.data.DataSource({
+						transport: {
+							read: {
+								url: "http://127.0.0.1:8000/employees/fields",
+								dataType: "json",
+							},
+							parameterMap: function(options) {
+								return JSON.stringify(options);
+							}
+						},
+					});
+					
+					//Issue call
+					fieldData.fetch(function() {
+						//Pull fields
+						var fieldJson = fieldData.data();
+						$.each(fieldJson, function(key, val) {
+							//Parse out
+							var breakdown = val.toJSON();
+							for(var key in breakdown) {
+								//Parse out specifics (even though we won't do anything with the types)
+								var obj = {};
+								var type = breakdown[key].type;
+								var name = breakdown[key].name;
+								
+								//Create field object
+								obj['title'] = fieldnames[name];
+								obj['field'] = name;
+								obj['width'] = 50;
+								obj['filterable'] = true;
+								gridColumns.push(obj);
+							}
+						});
+						
+						//Clear out waiting message
+						$("#grid").html("");
+						
+						//Build out grid
+						buildGrid();
+					});
+                });
+				
+				function buildGrid() {
+					//Now that we have data - let's set up the grid
+					$("#grid").kendoGrid({
+						dataSource: {
+							pageSize: 15,
+							serverFiltering: true,
+							type: "json",
+							transport: {
+								read: {
+									url: "http://127.0.0.1:8000/employees/query",
+									dataType: "jsonp",
+								},
+							},
+						},
+						filterable: {
+							operators: {
+								string: {
+									startswith: "Starts With",
+									eq: "Is Equal To",
+									neq: "Is Not Equal To"
+								}
+							}
+						},
+						height: 550,
+						scrollable: true,
+						pageable: true,
+						columns: gridColumns
+					});                   
+				}
+            </script>
+        </div>
+
+
+</body>
+</html>
