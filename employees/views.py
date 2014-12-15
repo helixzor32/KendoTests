@@ -1,13 +1,10 @@
 import json
-import sys
-import logging
 from django.db.models import Q
 from django.shortcuts import HttpResponse
 from django.shortcuts import render
 from django.db import models
 from employees.models import employees
 from django.core import serializers
-from pprint import pprint
 
 # Create your views here.
 def index(request):
@@ -93,6 +90,7 @@ def empquery(request):
 	#Return results
 	return HttpResponse(json.dumps(emp_records), content_type="application/json")
 
+#View handling for columns on grid
 def empfields(request):
 	#Initialize response
 	fieldList = {}
@@ -109,3 +107,14 @@ def empfields(request):
 	#Get data
 	#e = employees.objects.all()
 	return HttpResponse(json.dumps([fieldList]), content_type="application/json")
+
+#View handling for city dropdown
+def empcities(request):
+	cities = []
+	
+	list = employees.objects.values('city').distinct('city')
+	for city in list:
+		cities.append(city)
+	final = {}
+	final['d'] = cities
+	return HttpResponse(json.dumps(final), content_type="application/json")

@@ -21,17 +21,28 @@
 				var gridSource = [];
 				var gridData;
 				var gridColumns = [];
-				var id = 1;
 				
-				//hardcoded for now
-				var cities = ["Seattle", "Tacoma", "Kirkland", "Redmond", "London", "Philadelphia", "New York", "Seattle", "London", "Boston"];
+				//Hardcoded 'user friendly' column names
 				var fieldnames = { 'lname' : 'Last Name', 'fname' : 'First Name', 'id' : 'Employee ID', 'city' : 'City', 'title' : 'Title', 'dob' : 'Date Of Birth', 'age' : 'Age' };
-                
+				
+				//City filter dropdown setup
 				function cityFilter(element) {
                     element.kendoDropDownList({
-                        dataSource: cities,
-                        optionLabel: "--Select Value--"
-                    });
+                        dataSource: {
+							schema: {
+								data: "d"
+							},
+							transport: {
+								read: {
+									url: "http://127.0.0.1:8000/employees/cities",
+									dataType: "json"
+								}
+							}
+						},
+						optionLabel: "--Select Value--",
+						dataTextField: "city",
+						dataValueField: "city",
+					});
                 }
 				
                 $(document).ready(function() {
@@ -87,8 +98,9 @@
                 });
 									
 				function buildGrid() {
-					//Now that we have data - let's set up the grid
+					//Issue constructor call for grid
 					$("#grid").kendoGrid({
+						//Data source - JSON - allowing server filtering
 						dataSource: {
 							pageSize: 15,
 							transport: {
@@ -100,6 +112,7 @@
 							serverFiltering: true,
 							serverSorting: true,
 						},
+						//Set up filter options in dropdown
 						filterable: {
 							extra: false,
 							operators: {
@@ -114,6 +127,7 @@
 						scrollable: true,
 						sortable: true,
 						pageable: true,
+						//Set columns to what we calculated earlier
 						columns: gridColumns
 					});                   
 				}
