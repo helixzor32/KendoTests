@@ -34,7 +34,7 @@
 							},
 							transport: {
 								read: {
-									url: "http://127.0.0.1:8000/employees/cities",
+									url: "http://localhost/employees/cities",
 									dataType: "json"
 								}
 							}
@@ -50,7 +50,7 @@
 					fieldData = new kendo.data.DataSource({
 						transport: {
 							read: {
-								url: "http://127.0.0.1:8000/employees/fields",
+								url: "http://localhost/employees/fields",
 								dataType: "json",
 							},
 							parameterMap: function(options) {
@@ -105,7 +105,7 @@
 							pageSize: 100,
 							transport: {
 								read: {
-									url: "http://127.0.0.1:8000/employees/query",
+									url: "http://localhost/employees/query",
 									dataType: "json",
 								},
 							},
