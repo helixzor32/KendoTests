@@ -24,8 +24,16 @@
 				var id = 1;
 				
 				//hardcoded for now
+				var cities = ["Seattle", "Tacoma", "Kirkland", "Redmond", "London", "Philadelphia", "New York", "Seattle", "London", "Boston"];
 				var fieldnames = { 'lname' : 'Last Name', 'fname' : 'First Name', 'id' : 'Employee ID', 'city' : 'City', 'title' : 'Title', 'dob' : 'Date Of Birth', 'age' : 'Age' };
-
+                
+				function cityFilter(element) {
+                    element.kendoDropDownList({
+                        dataSource: cities,
+                        optionLabel: "--Select Value--"
+                    });
+                }
+				
                 $(document).ready(function() {
 					//Get view fields
 					fieldData = new kendo.data.DataSource({
@@ -53,12 +61,20 @@
 								var type = breakdown[key].type;
 								var name = breakdown[key].name;
 								
+								var add = {title: fieldnames[name], field: name, width: '100px'};
+								
+								//Handle date type
+								if(type == "DateTimeField") {
+									add.template = "#= kendo.toString(kendo.parseDate(dob, 'yyyy-MM-dd'), 'yyyy-MM-dd') #";
+								}
+								
+								//Handle city filter
+								if(name == "city") {
+									add.filterable = {ui: cityFilter};
+								}
+								
 								//Create field object
-								obj['title'] = fieldnames[name];
-								obj['field'] = name;
-								obj['width'] = 50;
-								obj['filterable'] = true;
-								gridColumns.push(obj);
+								gridColumns.push(add);
 							}
 						});
 						
@@ -69,36 +85,40 @@
 						buildGrid();
 					});
                 });
-				
+									
 				function buildGrid() {
 					//Now that we have data - let's set up the grid
 					$("#grid").kendoGrid({
 						dataSource: {
 							pageSize: 15,
-							serverFiltering: true,
-							type: "json",
 							transport: {
 								read: {
 									url: "http://127.0.0.1:8000/employees/query",
-									dataType: "jsonp",
+									dataType: "json",
 								},
 							},
+							serverFiltering: true,
+							serverSorting: true,
 						},
 						filterable: {
+							extra: false,
 							operators: {
 								string: {
 									startswith: "Starts With",
-									eq: "Is Equal To",
-									neq: "Is Not Equal To"
+									eq: "Equals",
+									con: "Contains"
 								}
 							}
 						},
 						height: 550,
 						scrollable: true,
+						sortable: true,
 						pageable: true,
 						columns: gridColumns
 					});                   
 				}
+				
+
             </script>
         </div>
 
