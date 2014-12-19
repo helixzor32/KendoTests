@@ -95,12 +95,16 @@ def empfieldsbare(request):
 	#Initialize response
 	fieldList = []
 	
+	#Hardcoded user friend field names
+	fieldnames = { 'lname' : 'Last Name', 'fname' : 'First Name', 'id' : 'Employee ID', 'city' : 'City', 'title' : 'Title', 'dob' : 'Date Of Birth', 'age' : 'Age' }
+
+	
 	#Get fields
 	i = 1	
 	x = employees._meta.fields
 	for field in x:
 		type = field.get_internal_type()
-		name = field.name
+		name = fieldnames[field.name]
 		temprec = {'name' : name, 'type' : type}
 		fieldList.append(temprec)
 		
