@@ -84,19 +84,35 @@ def empquery(request):
 	#Read through remaining fields and set up return list
 	for fields in e:		
 		#Set up entry
-		record = {'id' : fields.id, 'fname' : fields.fname, 'lname' : fields.lname, 'city' : fields.city, 'title' : fields.title, 'dob' : str(fields.dob), 'age' : fields.age }
+		record = {'id' : fields.id, 'fname' : fields.fname, 'lname' : fields.lname, 'city' : fields.city, 'title' : fields.title, 'dob' : str(fields.dob)[:10], 'age' : fields.age }
 		emp_records.append(record)
 		
 	#Return results
 	return HttpResponse(json.dumps(emp_records), content_type="application/json")
 
 #View handling for columns on grid
+def empfieldsbare(request):
+	#Initialize response
+	fieldList = []
+	
+	#Get fields
+	i = 1	
+	x = employees._meta.fields
+	for field in x:
+		type = field.get_internal_type()
+		name = field.name
+		temprec = {'name' : name, 'type' : type}
+		fieldList.append(temprec)
+		
+	return HttpResponse(json.dumps(fieldList), content_type="application/json")
+
+#View handling for columns on grid (angular)
 def empfields(request):
 	#Initialize response
 	fieldList = {}
 	
 	#Get fields
-	i = 1
+	i = 1	
 	x = employees._meta.fields
 	for field in x:
 		type = field.get_internal_type()
@@ -107,7 +123,7 @@ def empfields(request):
 	#Get data
 	#e = employees.objects.all()
 	return HttpResponse(json.dumps([fieldList]), content_type="application/json")
-
+	
 #View handling for city dropdown
 def empcities(request):
 	cities = []
